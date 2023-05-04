@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+
+<html>
+<head runat="server">
+    
+  <title>VX Tool</title>
+  <link rel="icon" type="image/x-icon" href="logo.png">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../TemplateFiles/css/navbar.css">
+  <link rel="stylesheet" href="../TemplateFiles/css/tool.css">
+  <script src = "https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js">
+  </script>
+  <script src = "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.js">
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <link href="https://fonts.googleapis.com/css?family=Futura&display=swap" rel="stylesheet" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  
+  <!--Painter js-->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/p5.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/addons/p5.dom.min.js"></script>
+        <script src="gridcanvas.js"></script>
+        <script src="braillepaint.js"></script>
+
+        <link rel="stylesheet" href="css/main.css">
+        <link rel="stylesheet" href="css/iosevka.css">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/solid.css" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/fontawesome.css" crossorigin="anonymous">
+</head>
+
+<script>
+  if (!window.confirm("You are going to use the tool of VISION-X.\nCancel to go back to homepage.")){
+    window.location.href="default.aspx";
+  }
+</script>
+<body>
+
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>                        
+              </button>
+             
+            <a class = "logo" href="default.aspx"><img src="../TemplateFiles/images/logo.png" alt="" height="45"></a>
+            <a class="navbar-brand vision-x" href="default.aspx"> VISION-X</a>
+            
+          </div>
+          <div class="collapse navbar-collapse" id="myNavbar">
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="default.aspx" >HOME</a></li>
+              <li><a href="default.aspx#about">ABOUT</a></li>
+              <li class="active"><a>TOOL</a></li>
+              <li><a href="catalog.aspx">CATALOG</a></li>
+            </ul>
+          </div>
+        </div>
+    </nav>
+
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-4" style="overflow:none">
+          <div class="dropdown" >
+            <button class="dropbtn"><span class="glyphicon glyphicon-list"></span></button>
+            <div class="dropdown-content">
+              <a href="#">Save</a>
+              <a id="download">Download image</a>
+              <a id="betatool">Draw tool(beta)</a>
+              <a href="#">History</a>
+            </div>
+          </div>
+          <h4>TOOL DASHBOARD <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-placement="right" title="Input parameters to generate printing document and information"></span></h4>
+          
+          <div class="select-shape">
+          <h5><b>Shape and text </h5></b>
+          <table>
+            <tr>
+              <td>Select shape: </td>
+              <td><select onchange="changeOptions(this)" id="select">
+                <option value="" selected="selected">Select shape</option>
+                <option value="square" >Square</option>
+                <option value="circle" >Circle</option>
+                <option value="rectangle" >Rectangle</option>
+                <option value="triangle" >Triangle</option>
+              </select>
+              </td>
+            </tr>
+            <tr>
+              <td valign = top>Enter text  : </td>
+              <td><textarea name="" id="myTextbox" style="resize: vertical;" placeholder="Leave blank if no text to convert to Braille"></textarea></td>
+            </tr> 
+
+            <!--braille font size editor-->
+            <tr>
+              <td>Braille size <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-placement="right" title="diameter of a dot, leave blank to set default value of xxx"></span>:</td>
+              <td><input type="number" value ="14" placeholder="(optional)" id="text-size" style="width: 90%" onchange="changeSizeText()">px</td>
+            </tr>       
+          </table>
+          </div>
+
+          <div class="select-shape inputpara" style="max-height: fit-content;" id="default">
+            <h5><b>Input Parameters</b></h5>
+            
+            <!--Dot size changer of shapes-->
+            <table><tr>
+              <td>Dot size <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-placement="right" title="diameter of a dot, leave blank to set default value of xxx"></span>:</td>
+              <td><input type="number" value ="14" placeholder="(optional)" style="width: 90%;" id="size-input" onchange="changeSizeShape()">px</td>
+            </tr></table>
+
+            <!-- Square div-->
+            <div class="className" id="square" style="display:none" >
+              <table>
+                <tr>
+                  <td>Side length: </td>
+                  <td><input type="text" placeholder="Enter dot count" style="width: 90%;" name="length"></td>
+                </tr>
+                <tr>
+                  <td>Fill type:</td>
+                  <td>
+                    <input type="radio" name="fill_type" value="hollow"> Hollow &nbsp; &nbsp; &nbsp; 
+                    <input type="radio" name="fill_type" value="solid"> Solid
+                  </td>
+                </tr>
+
+              </table>
+              <a class="generate-btn" runat ="server">Generate Square</a>
+              
+            </div>
+            <!--Circle div-->
+            <div class="className" style="display:none" id="circle">
+              <table>
+                <tr>
+                  <td>Circle's Radius: </td>
+                  <td><input type="text" placeholder="Enter dot count" name="radius" style="width: 90%;"></td>
+                </tr>
+                <tr>
+                  <td>Fill type:</td>
+                  <td>
+                    <input type="radio" name="fill_type" value="hollow"> Hollow &nbsp; &nbsp; &nbsp; 
+                    <input type="radio" name="fill_type" value="solid"> Solid
+                  </td>
+                </tr>
+              </table>
+              <a class="generate-btn" runat ="server">Generate Circle</a>
+            </div>
+
+            <!--Rectangle Div-->
+            <div class="className" id="rectangle" style="display:none">
+              <table>
+                <tr>
+                  <td>Length: </td>
+                  <td><input type="text" placeholder="Enter dot count" name="radius" style="width: 90%;"></td>
+                </tr>
+                <tr>
+                  <td>Breadth: </td>
+                  <td><input type="text" placeholder="Enter dot count" name="radius" style="width: 90%;"></td>
+                </tr>
+                <tr>
+                  <td>Fill type:</td>
+                  <td>
+                    <input type="radio" name="fill_type" value="hollow"> Hollow &nbsp; &nbsp; &nbsp; 
+                    <input type="radio" name="fill_type" value="solid"> Solid
+                  </td>
+                </tr>
+              </table>
+              <a class="generate-btn btnRect" runat ="server">Generate Rectangle</a>
+            </div> 
+            <!--Triangle div -->
+            <div class="className" id="triangle" style="display:none">
+                <table>
+                  <tr>
+                    <td>Side length (x): </td>
+                    <td><input type="text" name="l1" placeholder="enter base dot count" style="width: 80%;">cm</td>
+                  </tr>
+                  <tr>
+                    <td>Side length (y): </td>
+                    <td><input type="text" name="l2" placeholder="enter dot count" style="width: 80%;">cm</td>
+                  </tr>
+                  <tr>
+                    <td>Side length (z): </td>
+                    <td><input type="text" name="l3" placeholder="enter dot count" style="width: 80%;">cm</td>
+                  </tr>
+                  <tr>
+                    <td>Fill type:</td>
+                    <td>
+                      <input type="radio" name="fill_type" value="hollow"> Hollow &nbsp; &nbsp; &nbsp; 
+                      <input type="radio" name="fill_type" value="solid"> Solid
+                    </td>
+                  </tr>
+                </table>
+                <a class="generate-btn btnTri" runat ="server">Generate Triangle</a>
+            
+            </div> 
+            
+          </table>
+           </div>
+           <div class="select-shape ink">
+            <h5><strong> Ink Details</strong></h5>
+            <table>
+              <tr>
+                <td>Dot size: </td>
+                <td><input type="text" placeholder="3mm" disabled></td>
+                <td>Ink Per dot: </td>
+                <td><input type="text" placeholder="0.005ml" disabled></td>
+              </tr>
+              <tr>
+                <td>No. of dots:</td>
+                <td><input type="text" placeholder="60" disabled></td>
+                <td>Ink needed: </td>
+                <td><input type="text" placeholder="0.3ml" disabled></td>
+              </tr>
+            </table>
+           </div> 
+        </div>
+        <div class="col-sm-8" id="htmlContent" >
+          <br>
+          <p id="displayShape" style="font-family: Braille1;"></p>
+          <p id="displayText" style="font-family: Braille1;"></p>
+          <p id="shapeDrawSpace">
+          </p> 
+          
+
+        </div>
+      </div>
+    </div>
+
+    <script>
+      //change size of div htmlcontent
+      function changeSizeShape() {
+        var textSize = document.getElementById("size-input").value;
+        document.getElementById("shapeDrawSpace").style.fontSize = textSize + "px";
+      }
+     
+      function changeSizeText() {
+        var textSize = document.getElementById("text-size").value;
+        document.getElementById("displayShape").style.fontSize = textSize + "px";
+        document.getElementById("displayText").style.fontSize = textSize + "px";
+      }
+
+
+      //tooltip info
+        $(document).ready(function(){
+          $('[data-toggle="tooltip"]').tooltip(); 
+        });
+      
+      //to display div blocks
+      $('#select').change(function(){
+        $('#default div').hide();
+        $('#'+$(this).val()).show();
+      });
+
+     
+      //js for translating to braille
+        const textbox = document.getElementById("myTextbox");
+        const displayText = document.getElementById("displayText");
+
+        textbox.addEventListener("input", function() {
+          displayText.textContent = this.value;
+        });
+
+        const dropdown = document.getElementById("select");
+        const displayShape = document.getElementById("displayShape");
+
+        dropdown.addEventListener("change", function() {
+          displayShape.textContent = this.value;
+        });
+
+
+       
+
+
+    </script>
+    <script type="text/javascript">
+      function autoClick(){
+        $("#download").click();
+      }
+
+      $(document).ready(function(){
+        var element = $("#htmlContent");
+
+        $("#download").on('click', function(){
+
+          html2canvas(element, {
+            onrendered: function(canvas) {
+              var imageData = canvas.toDataURL("image/png");
+              var newData = imageData.replace(/^data:image\/png/, "data:application/octet-stream");
+              $("#download").attr("download", "image.png").attr("href", newData);
+            }
+          });
+
+        });
+      });
+    </script>
+    </body>
+
+
+    </html>
