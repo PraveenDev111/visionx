@@ -2,7 +2,7 @@
 
 <html>
 <head runat="server">
-    
+     
   <title>VX Tool</title>
   <link rel="icon" type="image/x-icon" href="logo.png">
   <meta charset="utf-8">
@@ -18,15 +18,10 @@
   <link href="https://fonts.googleapis.com/css?family=Futura&display=swap" rel="stylesheet" />
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-    <asp:ContentPlaceHolder ID="head" runat="server">
-    </asp:ContentPlaceHolder>
+  
 </head>
 
-<script>
-  if (!window.confirm("You are going to use the tool of VISION-X.\nCancel to go back to homepage.")){
-    window.location.href="default.aspx";
-  }
-</script>
+
 <body>
 
     <nav class="navbar navbar-default navbar-fixed-top">
@@ -45,7 +40,6 @@
           <div class="collapse navbar-collapse" id="myNavbar">
             <ul class="nav navbar-nav navbar-right">
               <li><a href="default.aspx" >HOME</a></li>
-              <li><a href="default.aspx#about">ABOUT</a></li>
               <li class="active"><a>TOOL</a></li>
               <li><a href="../../braille-paint-master/index.html" target="_blank">BETA TOOL</a></li>
               <li><a href="catalog.aspx">CATALOG</a></li>
@@ -57,20 +51,20 @@
 
     <div class="container-fluid">
       <div class="row">
-        <div class="col-sm-4" style="overflow:none">
+        <div class="col-sm-4" style="overflow:scroll">
           <div class="dropdown" >
             <button class="dropbtn"><span class="glyphicon glyphicon-list"></span></button>
-            <div class="dropdown-content">
-              <a href="#">Save</a>
-              <a id="download">Download image</a>
+            <div class="dropdown-content" style="cursor: pointer;">
+              <a onclick="window.print()">Print</a>
+              <a id="download">Download</a>
               <a href="#">Share</a>
-              <a href="#">History</a>
+              <a href="#">Try VX-BETA</a>
             </div>
           </div>
           <h4>TOOL DASHBOARD <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-placement="right" title="Input parameters to generate printing document and information"></span></h4>
           
           <div class="select-shape">
-          <h5><b>Shape and text </h5></b>
+          <h5><b>Shape selector</h5></b>
           <table>
             <tr>
               <td>Select shape: </td>
@@ -83,18 +77,9 @@
               </select>
               </td>
             </tr>
-            <tr>
-              <td valign = top>Enter text  : </td>
-              <td><textarea name="" id="myTextbox" style="resize: vertical;" placeholder="Leave blank if no text to convert to Braille"></textarea></td>
-            </tr> 
-
-            <!--braille font size editor-->
-            <tr>
-              <td>Braille size <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-placement="right" title="diameter of a dot, leave blank to set default value of xxx"></span>:</td>
-              <td><input type="number" value ="14" placeholder="(optional)" id="text-size" style="width: 90%" onchange="changeSizeText()">px</td>
-            </tr>       
           </table>
           </div>
+
 
           <div class="select-shape inputpara" style="max-height: fit-content;" id="default">
             <h5><b>Input Parameters</b></h5>
@@ -102,7 +87,7 @@
             <!--Dot size changer of shapes-->
             <table><tr>
               <td>Dot size <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-placement="right" title="diameter of a dot, leave blank to set default value of xxx"></span>:</td>
-              <td><input type="number" value ="14" placeholder="(optional)" style="width: 90%;" id="size-input" onchange="changeSizeShape()">px</td>
+              <td><input type="number" id="size-input" value ="14" placeholder="(optional)" style="width: 90%;"  onchange="changeSizeShape()">px</td>
             </tr></table>
 
             <!-- Square div-->
@@ -187,40 +172,113 @@
                   </tr>
                 </table>
                 <a class="generate-btn btnTri" runat ="server">Generate Triangle</a>
-            
             </div> 
             
           </table>
            </div>
+           <!--Braille text-->
+          <div class="select-shape">
+            <table>
+              <h5><b>Braille text to print </h5></b>
+              <tr>
+                <td valign = top>Enter text  : </td>
+                <td><textarea name="" id="myTextbox" style="resize: vertical;" placeholder="Leave blank if no text to convert to Braille"></textarea></td>
+              </tr> 
+              <!--braille font size editor-->
+              <tr>
+                <td>Braille size <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-placement="right" title="diameter of a dot, leave blank to set default value of xxx"></span>:</td>
+                <td><input type="number" value ="14" placeholder="(optional)" id="text-size" style="width: 90%" onchange="changeSizeText()">px</td>
+              </tr>       
+            </table>
+        </div>
            <div class="select-shape ink">
-            <h5><strong> Ink Details</strong></h5>
+            <h5><strong>Required ink for shape</strong>&nbsp;&nbsp;&nbsp;<button style="padding:1%;" type="button" onclick="calculateInk()">Calculate</button></h5>
             <table>
               <tr>
-                <td>Dot size: </td>
-                <td><input type="text" placeholder="3mm" disabled></td>
-                <td>Ink Per dot: </td>
-                <td><input type="text" placeholder="0.005ml" disabled></td>
+                <td>Dot size (px): </td>
+                <td><input type="text" id="dotsizeinpx" disabled placeholder="null"></td>
+                <td>Dot size (mm):</td>
+                <td><input type="text" id="dotsizeinmm" disabled placeholder="null"></td>
               </tr>
               <tr>
-                <td>No. of dots:</td>
-                <td><input type="text" placeholder="60" disabled></td>
+                <td>Number of dots:</td>
+                <td><input type="text" id="numDots" name="numDots" disabled placeholder="null"></td>
+                <td>Ink Per dot: </td>
+                <td><input type="text" id="inkPerDot" disabled placeholder="null"/></td>
+              </tr>
+              <tr>
                 <td>Ink needed: </td>
-                <td><input type="text" placeholder="0.3ml" disabled></td>
+                <td><input type="text" placeholder="null" id ="inkForDots" disabled ></td>
+                <td>ml</td><td></td>
               </tr>
             </table>
            </div> 
+           <div class="select-shape ink">
+            <h5><strong>Cost of printing</strong> &nbsp;&nbsp;<button style="padding:1%;" type="button" onclick="calculateCost()">Calculate</button></h5>
+            <table>
+              <tr>
+                <td>Price of ink bottle: </td>
+                <td>Rs.<input style="width:fit-content" type="text" id="bottleprice" placeholder="enter price (lkr)"></td>
+              </tr>
+              <tr>
+                <td>Liquid size per bottle:</td>
+                <td><input style="width:fit-content"  type="text" id="bottlesize" placeholder="in ml">ml</td>
+              </tr>
+              <tr>
+                <td>Cost of printing:</td>
+                <td><input style="width:fit-content"  type="text" id="printingcost" disabled placeholder="null"></td>
+              </tr>
+              </table>
+           </div>
         </div>
         <div class="col-sm-8" id="htmlContent" >
           <br>
           <p id="displayShape" style="font-family: Braille1;"></p>
-          <p id="displayText" style="font-family: Braille1;"></p>
-          <p id="shapeDrawSpace"></p> 
-          
-
+          <p id="displayText" style="font-family: Braille1;" class="hi2"></p>
+          <p id="shapeDrawSpace" class="hi3">..........</p> 
         </div>
       </div>
     </div>
+    <script>
+      
+      function calculateCost() {
+        const bottlePrice = document.getElementById('bottleprice').value;
+        const bottleSize = document.getElementById('bottlesize').value;
+        
+        if (!bottlePrice || !bottleSize) {
+          alert('Costing: Please enter values for all fields!');
+          return;
+        }
+        const liquidCost = bottlePrice / bottleSize;
+        const inktot = (document.getElementById("inkForDots").value);
+        const cost = (inktot*liquidCost)/1000;
+        document.getElementById('printingcost').value = ' Rs.'+ cost.toFixed(4)  ;
+      }
 
+
+      function calculateInk() {
+        // Get input values
+        let dotSize = document.getElementById("size-input").value;
+        //let numDots = document.getElementById("shapeDrawSpace").innerHTML;
+        const numDots = document.getElementById("shapeDrawSpace").textContent.length;
+
+        // Calculate ink required for one dot
+        let screenResolution = window.devicePixelRatio * 96;
+              let dotDiameter = (dotSize/screenResolution)*25.4;
+        let dotRadius = dotDiameter/2 // Convert pixel size to mm
+        let dotVolume = (4/3) * Math.PI * Math.pow(dotRadius, 3);
+  
+        // Calculate ink required for specified number of dots
+        let inkForDots = dotVolume * numDots;
+  
+        // Display results
+        document.getElementById("dotsizeinpx").value = dotSize + " px";
+        document.getElementById("numDots").value = numDots;
+        document.getElementById("dotsizeinmm").value = dotDiameter.toFixed(2)+"mm";
+        document.getElementById("inkPerDot").value = (dotVolume/1000).toFixed(4) + " ml";
+        document.getElementById("inkForDots").value = (inkForDots/1000).toFixed(4);
+      }
+    </script>
     <script>
       //change size of div htmlcontent
       function changeSizeShape() {
