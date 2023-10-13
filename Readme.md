@@ -2,6 +2,10 @@
 
 Vision X is a web application that enables the visually impaired to understand and visualize different shapes. With the help of Vision X, a given shape can be converted into dots, which can be saved and printed later. This feature of Vision X makes it possible for the visually impaired to touch and feel the shape and understand its size and dimensions.
 
+# Screenshots
+<img src= "ss1.png">
+<img src= "ss2.png">
+
 ## Features
 
 Vision X has the following features:
